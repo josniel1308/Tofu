@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Una Sorpresa para Tofu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f8f9fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            transition: all 0.5s ease;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        header {
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            color: #764ba2;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        .contenido {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 30px 0;
+        }
+        
+        .mensaje-previo {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .btn-revelar {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-revelar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        }
+        
+        .btn-revelar:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-revelar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-revelar:hover::before {
+            left: 100%;
+        }
+        
+        .susto {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .susto.activo {
+            display: flex;
+            animation: susto 0.8s ease;
+        }
+        
+        .imagen-susto {
+            max-width: 80%;
+            max-height: 60%;
+            object-fit: contain;
+            animation: latido 0.3s infinite;
+        }
+        
+        .mensaje-susto {
+            color: #ff0000;
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            animation: parpadeo 0.5s infinite;
+            margin-top: 30px;
+        }
+        
+        @keyframes susto {
+            0% { 
+                opacity: 0; 
+                background-color: #000;
+            }
+            50% { 
+                opacity: 1; 
+                background-color: #300000;
+            }
+            100% { 
+                opacity: 1; 
+                background-color: #000;
+            }
+        }
+        
+        @keyframes latido {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        
+        @keyframes parpadeo {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .mensaje-final {
+            background: rgba(118, 75, 162, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border-left: 4px solid #764ba2;
+        }
+        
+        .btn-volver {
+            background: #764ba2;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .btn-volver:hover {
+            background: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .advertencia {
+            color: #ff6b6b;
+            font-style: italic;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .fallback-image {
+            display: none;
+            font-size: 10rem;
+            margin-bottom: 30px;
+            animation: latido 0.3s infinite;
+        }
+        
+        .cargando {
+            display: none;
+            font-size: 1.1rem;
+            color: #764ba2;
+            margin-top: 15px;
+        }
+        
+        .cargando.activo {
+            display: block;
+            animation: latido 1s infinite;
+        }
+        
+        .contador {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .contador.activo {
+            display: block;
+        }
+        
+        .mensaje-amistad {
+            display: none;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+            animation: aparecer 0.8s ease;
+        }
+        
+        .mensaje-amistad.activo {
+            display: block;
+        }
+        
+        @keyframes aparecer {
+            0% { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .corazon {
+            color: #ff6b6b;
+            font-size: 1.5rem;
+            margin: 0 5px;
+            animation: latido 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Elemento de audio para el susto -->
+    <audio id="sonidoSusto" preload="auto">
+        <source src="susto.mp3" type="audio/mpeg">
+        <source src="susto.ogg" type="audio/ogg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    
+    <!-- Elemento de audio para el suspense -->
+    <audio id="sonidoSuspenso" preload="auto">
+        <source src="suspenso.mp3" type="audio/mpeg">
+        <source src="suspenso.ogg" type="audio/ogg">
+    </audio>
+
+    <div class="container">
+        <header>
+            <h1>Una Sorpresa Especial</h1>
+            <p class="subtitle">Para ti, Tofu</p>
+        </header>
+        
+        <div class="contenido">
+            <div class="mensaje-previo">
+                <p>Hola Tofu,</p>
+                <p style="margin: 15px 0;">
+                    Has sido tan increíble que preparé algo especial para ti. 
+                    Pero antes de revelarlo, necesito que hagas clic en el botón de abajo.
+                </p>
+                <p>
+                    Confía en mí, valoro mucho nuestra amistad y esto es solo una pequeña muestra 
+                    de lo divertido que puede ser ser amigos virtuales.
+                </p>
+            </div>
+            
+            <button class="btn-revelar" id="btnRevelar">
+                Revelar lo que siento por ti
+            </button>
+            
+            <div class="cargando" id="cargando">
+                Cargando sorpresa...
+            </div>
+            
+            <div class="contador" id="contador">
+                3
+            </div>
+            
+            <div class="mensaje-amistad" id="mensajeAmistad">
+                <span class="corazon">💜</span>
+                ¡JAJAJA! Solo era una broma, Tofu. 
+              no me odies, igual te quiero amiga
+                <span class="corazon">💜</span>
+            </div>
+            
+            <p class="advertencia">
+                ⚠️ Prepárate para una sorpresa inesperada
+            </p>
+        </div>
+        
+        <div class="mensaje-final">
+            <p>No importa lo que pase después del clic, recuerda que:</p>
+            <p style="margin: 15px 0; font-weight: bold;">
+                "Tu amistad hace que cada día en línea valga la pena"
+            </p>
+            <button class="btn-volver" id="btnVolver">Volver al inicio</button>
+        </div>
+    </div>
+    
+    <div class="susto" id="susto">
+        <img src="jumpscare.png" alt="Susto" class="imagen-susto" id="imagenSusto" onerror="mostrarFallback()">
+        <div class="fallback-image" id="fallbackImage">😱</div>
+        <div class="mensaje-susto">¡¡SORPRESA TOFU!!</div>
+    </div>
+
+    <script>
+        // Elementos de audio
+        const sonidoSusto = document.getElementById('sonidoSusto');
+        const sonidoSuspenso = document.getElementById('sonidoSuspenso');
+        
+        function mostrarFallback() {
+            document.getElementById('imagenSusto').style.display = 'none';
+            document.getElementById('fallbackImage').style.display = 'block';
+        }
+
+        function reproducirSonido(audioElement) {
+            audioElement.currentTime = 0;
+            audioElement.play().catch(e => {
+                console.log('Error reproduciendo audio:', e);
+            });
+        }
+
+        document.getElementById('btnRevelar').addEventListener('click', function() {
+            const btn = this;
+            const cargando = document.getElementById('cargando');
+            const contador = document.getElementById('contador');
+            const mensajeAmistad = document.getElementById('mensajeAmistad');
+            
+            // Ocultar mensaje de amistad si estaba visible
+            mensajeAmistad.classList.remove('activo');
+            
+            // Cambiar texto del botón y deshabilitar
+            btn.textContent = "Preparando la sorpresa...";
+            btn.disabled = true;
+            
+            // Mostrar carga
+            cargando.classList.add('activo');
+            
+            // Reproducir sonido de suspenso
+            reproducirSonido(sonidoSuspenso);
+            
+            // Efecto de suspense visual
+            document.body.style.transition = "all 1s ease";
+            document.body.style.filter = "brightness(0.6) blur(2px)";
+            
+            // Contador regresivo
+            setTimeout(() => {
+                cargando.style.display = 'none';
+                contador.classList.add('activo');
+                
+                let count = 3;
+                contador.textContent = count;
+                
+                const countdown = setInterval(() => {
+                    count--;
+                    contador.textContent = count;
+                    
+                    if (count <= 0) {
+                        clearInterval(countdown);
+                        contador.classList.remove('activo');
+                        activarSusto();
+                    }
+                }, 1000);
+                
+            }, 2000);
+        });
+        
+        function activarSusto() {
+            // Activar el jumpscare
+            document.getElementById('susto').classList.add('activo');
+            
+            // Reproducir sonido de susto
+            reproducirSonido(sonidoSusto);
+            
+            // Efecto de vibración más intenso
+            document.body.style.animation = 'vibrar 0.2s linear infinite';
+            
+            // Quitar el susto después de 3 segundos
+            setTimeout(function() {
+                const btn = document.getElementById('btnRevelar');
+                const mensajeAmistad = document.getElementById('mensajeAmistad');
+                
+                document.getElementById('susto').classList.remove('activo');
+                document.body.style.animation = '';
+                document.body.style.filter = '';
+                
+                // Mostrar mensaje de amistad en lugar de alerta
+                mensajeAmistad.classList.add('activo');
+                
+                // Cambiar el botón
+                btn.textContent = "¡Ja! ¡Te asusté!";
+                btn.style.background = "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)";
+                btn.disabled = false;
+                
+            }, 3000);
+        }
+        
+        document.getElementById('btnVolver').addEventListener('click', function() {
+            // Efecto de salida
+            document.body.style.transition = "all 0.8s ease";
+            document.body.style.opacity = "0";
+            document.body.style.filter = "blur(10px)";
+            
+            setTimeout(() => {
+                window.location.href = "../index.html";
+            }, 800);
+        });
+        
+        // Añadir estilo para la vibración
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes vibrar {
+                0% { transform: translate(0, 0) rotate(0deg); }
+                20% { transform: translate(-10px, 10px) rotate(-2deg); }
+                40% { transform: translate(10px, -10px) rotate(2deg); }
+                60% { transform: translate(-8px, -8px) rotate(-1deg); }
+                80% { transform: translate(8px, 8px) rotate(1deg); }
+                100% { transform: translate(0, 0) rotate(0deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Verificar si la imagen existe al cargar la página
+        window.addEventListener('load', function() {
+            const img = document.getElementById('imagenSusto');
+            img.onerror = function() {
+                mostrarFallback();
+            };
+            
+            // Precargar sonidos
+            sonidoSusto.load();
+            sonidoSuspenso.load();
+        });
+        
+        // Efecto de partículas en el fondo (opcional)
+        document.addEventListener('DOMContentLoaded', function() {
+            const colors = ['#ff6b6b', '#764ba2', '#667eea', '#4CAF50'];
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: fixed;
+                    width: 4px;
+                    height: 4px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: -1;
+                    top: ${Math.random() * 100}vh;
+                    left: ${Math.random() * 100}vw;
+                    animation: float 3s ease-in forwards;
+                `;
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 3000);
+            }, 500);
+        });
+        
+        // Añadir animación para partículas
+        const particleStyle = document.createElement('style');
+        particleStyle.textContent = `
+            @keyframes float {
+                0% {
+                    transform: translateY(0) scale(1);
+                    opacity: 0.7;
+                }
+                100% {
+                    transform: translateY(-100px) scale(0);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(particleStyle);
+    </script>
+</body>
+</html>
